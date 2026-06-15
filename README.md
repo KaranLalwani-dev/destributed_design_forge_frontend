@@ -81,3 +81,4 @@ The frontend can be containerized and deployed alongside the backend services in
 npm run build
 # Output goes to /dist — serve with nginx or deploy to your cluster
 ```
+<img width="1710" height="942" alt="image" src="https://github.com/user-attachments/assets/d674f134-1c5f-44dd-8761-29eb274f9b8d" />
