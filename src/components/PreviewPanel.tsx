@@ -20,6 +20,8 @@ export function PreviewPanel({ projectId, runtimeError, onDismiss, onFix }: Prev
     return localStorage.getItem(previewUrlKey);
   });
   const [isDeploying, setIsDeploying] = useState(false);
+  const [isPreviewReady, setIsPreviewReady] = useState(false);
+  const [iframeKey, setIframeKey] = useState(0);
   const { toast } = useToast();
 
   // Update previewUrl when projectId changes
@@ -36,8 +38,51 @@ export function PreviewPanel({ projectId, runtimeError, onDismiss, onFix }: Prev
     }
   }, [previewUrl, previewUrlKey]);
 
+  // Poll the preview URL to check when it's fully ready
+  useEffect(() => {
+    if (!previewUrl) {
+      setIsPreviewReady(false);
+      return;
+    }
+
+    setIsPreviewReady(false);
+    let isMounted = true;
+    let timeoutId: NodeJS.Timeout;
+
+    const checkReady = async () => {
+      if (!isMounted) return;
+      try {
+        const res = await fetch(previewUrl);
+        const text = await res.text();
+        
+        if (text.includes("Preview server unavailable") || text.includes("starting")) {
+          timeoutId = setTimeout(checkReady, 1000);
+        } else {
+          if (isMounted) {
+            setIsPreviewReady(true);
+            setIframeKey(k => k + 1); // remount iframe to get the fresh content
+          }
+        }
+      } catch (e) {
+        // If fetch fails (e.g. CORS from the real Vite server), we assume it's ready
+        if (isMounted) {
+          setIsPreviewReady(true);
+          setIframeKey(k => k + 1);
+        }
+      }
+    };
+
+    checkReady();
+
+    return () => {
+      isMounted = false;
+      clearTimeout(timeoutId);
+    };
+  }, [previewUrl]);
+
   const handleDeploy = async () => {
     setIsDeploying(true);
+    setIsPreviewReady(false);
 
     try {
       const response = await api.deploy(projectId);
@@ -65,15 +110,15 @@ export function PreviewPanel({ projectId, runtimeError, onDismiss, onFix }: Prev
   };
 
   return (
-    <div className="flex flex-col h-full bg-background">
+    <div className="flex flex-col h-full bg-background relative">
       {/* URL Bar */}
-      <div className="h-12 shrink-0 flex items-center gap-2 px-3 border-b border-border/50 bg-panel">
+      <div className="h-12 shrink-0 flex items-center gap-2 px-3 border-b border-border/50 bg-panel z-20">
         <div className="flex items-center gap-1">
           <Button
             variant="ghost"
             size="icon"
             onClick={handleRefresh}
-            disabled={!previewUrl}
+            disabled={!previewUrl || !isPreviewReady}
             className="h-7 w-7 text-muted-foreground hover:text-foreground"
           >
             <RefreshCw className="w-3.5 h-3.5" />
@@ -102,7 +147,7 @@ export function PreviewPanel({ projectId, runtimeError, onDismiss, onFix }: Prev
             onClick={handleDeploy}
             disabled={isDeploying}
             size="sm"
-            className="h-7 px-3 bg-primary hover:bg-primary/90 text-xs font-medium"
+            className="h-7 px-3 bg-primary hover:bg-primary/90 text-primary-foreground text-xs font-medium"
           >
             {isDeploying ? (
               <>
@@ -120,20 +165,36 @@ export function PreviewPanel({ projectId, runtimeError, onDismiss, onFix }: Prev
       </div>
 
       {/* Preview Area */}
-      <div className="flex-1 bg-[#1a1a1a]">
+      <div className="flex-1 bg-muted relative overflow-hidden">
+        {/* Glass Loading Screen */}
+        {previewUrl && (!isPreviewReady || isDeploying) && (
+          <div className="absolute inset-0 flex flex-col items-center justify-center bg-background/50 backdrop-blur-md z-10 animate-in fade-in duration-300">
+            <div className="flex flex-col items-center justify-center p-8 rounded-2xl bg-panel/40 border border-border shadow-[0_8px_32px_0_rgba(0,0,0,0.05)] backdrop-blur-xl">
+              <Loader2 className="w-8 h-8 text-foreground animate-spin mb-4" />
+              <h3 className="text-sm font-medium text-foreground mb-1 font-serif tracking-wide">
+                Preparing Environment
+              </h3>
+              <p className="text-xs text-muted-foreground">
+                Starting development server...
+              </p>
+            </div>
+          </div>
+        )}
+
         {previewUrl ? (
           <iframe
+            key={iframeKey}
             src={previewUrl}
-            className="w-full h-full border-0"
+            className={`w-full h-full border-0 transition-opacity duration-500 ${!isPreviewReady || isDeploying ? 'opacity-0' : 'opacity-100'}`}
             title="Preview"
             sandbox="allow-scripts allow-same-origin allow-forms allow-popups"
           />
         ) : (
-          <div className="flex flex-col items-center justify-center h-full text-center p-8">
-            <div className="w-16 h-16 rounded-xl bg-muted/20 flex items-center justify-center mb-4">
-              <Globe className="w-8 h-8 text-muted-foreground/50" />
+          <div className="flex flex-col items-center justify-center h-full text-center p-8 bg-background">
+            <div className="w-16 h-16 rounded-xl bg-muted/50 flex items-center justify-center mb-4 border border-border/50">
+              <Globe className="w-8 h-8 text-muted-foreground/40" />
             </div>
-            <p className="text-sm text-muted-foreground">
+            <p className="text-sm text-muted-foreground font-serif">
               No preview available yet
             </p>
           </div>
