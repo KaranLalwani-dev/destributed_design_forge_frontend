@@ -13,7 +13,7 @@ export const ChatEventRenderer = ({ event, isLoading }: { event: ChatEvent, isLo
   switch (event.type) {
     case ChatEventType.THOUGHT:
       return (
-        <div className="flex items-center gap-2 text-[#949494] text-[13px] font-normal mb-4">
+        <div className="flex items-center gap-2 text-muted-foreground text-[13px] font-normal mb-4">
           {isLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Lightbulb className="w-4 h-4" />}
           <span>{event.content}</span>
         </div>
@@ -27,7 +27,7 @@ export const ChatEventRenderer = ({ event, isLoading }: { event: ChatEvent, isLo
               />;
 
     case ChatEventType.FILE_EDIT:
-     return <CollapsibleEvent 
+      return <CollapsibleEvent 
                 icon={isLoading ? <Loader2 className="w-4 h-4 animate-spin text-primary" /> : <FileEdit className="w-4 h-4" />} 
                 label={isLoading ? "Editing" : "Edited"} 
                 event={event} 
@@ -37,7 +37,7 @@ export const ChatEventRenderer = ({ event, isLoading }: { event: ChatEvent, isLo
 
     case ChatEventType.MESSAGE:
       return (
-        <div className="prose prose-invert prose-sm max-w-none text-[#ececec] leading-relaxed mb-4">
+        <div className="prose prose-sm max-w-none text-foreground leading-relaxed mb-4">
           <ReactMarkdown remarkPlugins={[remarkGfm]}>
             {event.content}
           </ReactMarkdown>
@@ -61,7 +61,7 @@ const CollapsibleEvent = ({
   label: string, 
   event: ChatEvent,
   hideToggle?: boolean,
-    forceSingleLine?: boolean
+  forceSingleLine?: boolean
 }) => {
   const [isExpanded, setIsExpanded] = useState(false);
   
@@ -79,18 +79,18 @@ const CollapsibleEvent = ({
     <div className="flex flex-col gap-2 my-2">
       <div className="flex items-center justify-between w-full">
         <div className="flex items-center gap-3">
-          <div className="text-[#949494] shrink-0">{icon}</div>
+          <div className="text-muted-foreground shrink-0">{icon}</div>
           <div className="flex items-center gap-2 overflow-hidden">
-            <span className="text-[#949494] text-[13px] font-medium shrink-0">{label}</span>
+            <span className="text-muted-foreground text-[13px] font-medium shrink-0">{label}</span>
             
             {/* File Name Badge */}
-            <span className="bg-[#262626] text-[#ececec] text-[12px] px-2 py-0.5 rounded-md font-mono border border-[#333] truncate">
+            <span className="bg-muted text-foreground text-[12px] px-2 py-0.5 rounded-md font-mono border border-border truncate">
               {files[0].split('/').pop()}
             </span>
 
             {/* +X more logic */}
             {!isExpanded && hasMultipleFiles && (
-              <span className="text-[#949494] text-[11px] whitespace-nowrap">
+              <span className="text-muted-foreground text-[11px] whitespace-nowrap">
                 +{files.length - 1} more
               </span>
             )}
@@ -100,7 +100,7 @@ const CollapsibleEvent = ({
         {showButton && (
           <button 
             onClick={() => setIsExpanded(!isExpanded)}
-            className="text-[#949494] hover:text-[#ececec] text-[12px] font-medium bg-[#1a1a1a] px-2 py-0.5 rounded border border-[#333] transition-colors ml-4"
+            className="text-muted-foreground hover:text-foreground text-[12px] font-medium bg-muted px-2 py-0.5 rounded border border-border transition-colors ml-4"
           >
             {isExpanded ? 'Hide' : 'Show'}
           </button>
@@ -112,9 +112,9 @@ const CollapsibleEvent = ({
         <div className="flex flex-col gap-2">
           {files.slice(1).map((file, idx) => (
             <div key={idx} className="flex items-center gap-3 animate-in fade-in slide-in-from-top-1 duration-200">
-               <div className="text-[#949494] shrink-0 opacity-0">{icon}</div> {/* Invisible spacer icon */}
-               <span className="text-[#949494] text-[13px] font-medium w-8 shrink-0">{label}</span>
-               <span className="bg-[#262626] text-[#ececec] text-[12px] px-2 py-0.5 rounded-md font-mono border border-[#333] truncate">
+               <div className="text-muted-foreground shrink-0 opacity-0">{icon}</div> {/* Invisible spacer icon */}
+               <span className="text-muted-foreground text-[13px] font-medium w-8 shrink-0">{label}</span>
+               <span className="bg-muted text-foreground text-[12px] px-2 py-0.5 rounded-md font-mono border border-border truncate">
                  {file.split('/').pop()}
                </span>
             </div>

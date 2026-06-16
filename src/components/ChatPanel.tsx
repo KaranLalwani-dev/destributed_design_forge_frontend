@@ -120,10 +120,7 @@ export function ChatPanel({ messages, onSendMessage, isStreaming, isLoading, rea
           </Button>
         </form>
 
-        <div className="flex items-center justify-between mt-2 px-1">
-          <div className="flex items-center gap-1 text-xs text-muted-foreground">
-            <span>✨ AI-Powered Design System</span>
-          </div>
+        <div className="flex items-center justify-end mt-2 px-1">
           {isStreaming && (
             <span className="text-xs text-muted-foreground flex items-center gap-1 font-medium">
               <Loader2 className="w-3 h-3 animate-spin text-primary" />

@@ -44,10 +44,10 @@ export function ShareDialog({ projectId, trigger, open, onOpenChange }: ShareDia
     const loadMembers = async () => {
         try {
             const data = await api.getProjectMembers(projectId);
-            setMembers(data);
+            setMembers(Array.isArray(data) ? data : []);
         } catch (error) {
-            // Fail silently or show placeholder if valid "mock" experience is needed
             console.error("Failed to load members", error);
+            setMembers([]);
         }
     };
 
@@ -144,11 +144,11 @@ export function ShareDialog({ projectId, trigger, open, onOpenChange }: ShareDia
                                 </div>
                             )}
 
-                            {members.map(member => (
+                            {Array.isArray(members) && members.map(member => (
                                 <div key={member.userId} className="flex items-center gap-3 p-2 rounded-lg hover:bg-muted/50 transition-colors">
                                     <Avatar className="h-9 w-9">
                                         <AvatarFallback className="text-xs font-medium">
-                                            {member.name ? member.name.charAt(0).toUpperCase() : member.username.slice(0, 2).toUpperCase()}
+                                            {member.name ? member.name.charAt(0).toUpperCase() : (member.username || "U").slice(0, 2).toUpperCase()}
                                         </AvatarFallback>
                                     </Avatar>
                                     <div className="flex-1 min-w-0 text-sm">
