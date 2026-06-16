@@ -2,7 +2,8 @@ import { useState, useEffect, useCallback } from "react";
 import { FileTree } from "./FileTree";
 import { CodeEditor } from "./CodeEditor";
 import { FileTabs } from "./FileTabs";
-import { api, FileNode, OPEN_TABS_KEY, ACTIVE_TAB_KEY } from "@/lib/api";
+import { api, OPEN_TABS_KEY, ACTIVE_TAB_KEY } from "@/lib/api";
+import { FileNode } from "@/lib/types";
 
 interface CodePanelProps {
   projectId: string;
@@ -34,7 +35,7 @@ export function CodePanel({ projectId, updatedFiles }: CodePanelProps) {
   useEffect(() => {
     const savedTabs = localStorage.getItem(getTabsKey(projectId));
     const savedActiveTab = localStorage.getItem(getActiveTabKey(projectId));
-    
+
     if (savedTabs) {
       try {
         const tabs = JSON.parse(savedTabs);
@@ -74,7 +75,7 @@ export function CodePanel({ projectId, updatedFiles }: CodePanelProps) {
       try {
         const fileTree = await api.getFiles(projectId);
         setFiles(fileTree);
-        
+
         // If no tabs are open, default to pages/Index.tsx
         if (openTabs.length === 0) {
           const defaultPaths = ["src/pages/Index.tsx", "pages/Index.tsx"];
@@ -143,14 +144,14 @@ export function CodePanel({ projectId, updatedFiles }: CodePanelProps) {
   const handleCloseTab = useCallback((path: string) => {
     setOpenTabs((prev) => {
       const newTabs = prev.filter((t) => t !== path);
-      
+
       // If closing active tab, switch to another tab
       if (activeTab === path) {
         const closingIndex = prev.indexOf(path);
         const newActiveIndex = Math.min(closingIndex, newTabs.length - 1);
         setActiveTab(newTabs[newActiveIndex] || null);
       }
-      
+
       return newTabs;
     });
   }, [activeTab]);
@@ -183,7 +184,7 @@ export function CodePanel({ projectId, updatedFiles }: CodePanelProps) {
           onSelectTab={handleSelectTab}
           onCloseTab={handleCloseTab}
         />
-        
+
         {/* Editor */}
         <div className="flex-1 overflow-hidden">
           <CodeEditor

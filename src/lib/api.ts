@@ -139,21 +139,15 @@ export const api = {
   },
 
   async getFileContent(projectId: string, path: string): Promise<string> {
-    const response = await fetch(
-      `${BASE_URL}/api/v1/workspace/projects/${projectId}/files/content?path=${path}`,
-      {
-        headers: { ...getAuthHeaders() },
-      }
-    );
-
-    const data = await response.json();
+    const response = await fetch(`${BASE_URL}/api/v1/workspace/projects/${projectId}/files/content?path=${path}`, {
+      headers: { ...getAuthHeaders() },
+    });
 
     if (!response.ok) {
-      console.error(`Error fetching file: ${response.status} ${response.statusText}`);
-      throw new Error("Failed to fetch file content");
+      throw new Error(`Error fetching file: ${response.status} ${response.statusText}`);
     }
 
-    return data.content;
+    return response.text();
   },
 
   async deploy(projectId: string): Promise<DeployResponse> {
