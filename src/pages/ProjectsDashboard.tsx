@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { Plus, LogOut, Search, Folder, Loader2, MoreVertical, Trash, Download, Edit } from "lucide-react";
+import { Plus, LogOut, Search, Folder, Loader2, MoreVertical, Trash, Download, Edit, LayoutTemplate } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
@@ -142,8 +142,16 @@ export function ProjectsDashboard() {
     return (
         <div className="min-h-screen bg-background">
             {/* Header */}
-            <header className="border-b border-black/5 bg-background/60 backdrop-blur-2xl">
-                <div className="container flex h-16 max-w-screen-2xl items-center justify-end px-4 sm:px-8">
+            <header className="sticky top-0 z-50 border-b border-border/40 bg-background/80 backdrop-blur-xl">
+                <div className="container flex h-16 max-w-screen-2xl items-center justify-between px-4 sm:px-8">
+                    <div className="flex items-center gap-3">
+                        <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-primary/80 to-primary flex items-center justify-center text-primary-foreground shadow-sm">
+                            <LayoutTemplate className="w-6 h-6" />
+                        </div>
+                        <span className="font-bold text-xl tracking-tight hidden sm:inline-block">DesignForge</span>
+                    </div>
+                    
+                    <div className="flex items-center gap-4">
                     <DropdownMenu>
                         <DropdownMenuTrigger asChild>
                             <Button variant="ghost" size="icon" className="h-9 w-9 rounded-full">
@@ -175,6 +183,7 @@ export function ProjectsDashboard() {
                             </DropdownMenuItem>
                         </DropdownMenuContent>
                     </DropdownMenu>
+                    </div>
                 </div>
             </header>
 
@@ -248,10 +257,10 @@ export function ProjectsDashboard() {
                 <div className="relative mb-10 max-w-md group">
                     <div className="absolute -inset-1 bg-gradient-to-r from-primary/20 to-primary/0 rounded-full blur opacity-0 group-hover:opacity-100 transition duration-500"></div>
                     <div className="relative">
-                        <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                            <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
                         <Input
                             placeholder="Search projects..."
-                            className="pl-11 rounded-full bg-panel/40 backdrop-blur-xl border-black/5 h-12 focus-visible:ring-primary/50 transition-colors"
+                            className="pl-11 rounded-full bg-card shadow-sm border-border h-12 focus-visible:ring-primary/50 transition-all hover:shadow-md"
                             value={searchQuery}
                             onChange={(e) => setSearchQuery(e.target.value)}
                         />
@@ -278,7 +287,7 @@ export function ProjectsDashboard() {
                         {filteredProjects.map((project) => (
                             <Card
                                 key={project.id}
-                                className="group cursor-pointer transition-all duration-300 hover:scale-[1.02] border-black/5 bg-panel/40 backdrop-blur-2xl shadow-panel hover:shadow-glow overflow-hidden rounded-2xl"
+                                className="group cursor-pointer transition-all duration-300 hover:-translate-y-1 bg-card border-border shadow-sm hover:shadow-lg overflow-hidden rounded-2xl"
                                 onClick={() => navigate(`/projects/${project.id}`)}
                             >
                                 <CardHeader className="p-0">
