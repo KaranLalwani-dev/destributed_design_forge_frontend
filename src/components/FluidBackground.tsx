@@ -2,13 +2,13 @@ import { useEffect, useRef } from 'react';
 import webGLFluidEnhanced from 'webgl-fluid-enhanced';
 
 export const FluidBackground: React.FC = () => {
-  const canvasRef = useRef<HTMLCanvasElement>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     let fluid: webGLFluidEnhanced | null = null;
 
-    if (canvasRef.current) {
-      fluid = new webGLFluidEnhanced(canvasRef.current);
+    if (containerRef.current) {
+      fluid = new webGLFluidEnhanced(containerRef.current);
       
       fluid.setConfig({
         simResolution: 256,
@@ -48,11 +48,9 @@ export const FluidBackground: React.FC = () => {
   }, []);
 
   return (
-    <div className="fixed inset-0 z-0 pointer-events-auto">
-      <canvas
-        ref={canvasRef}
-        className="h-full w-full opacity-60 mix-blend-multiply" // Adding opacity and multiply blend to integrate well with light background
-      />
-    </div>
+    <div 
+      ref={containerRef} 
+      className="fixed inset-0 z-0 pointer-events-auto opacity-60 mix-blend-multiply" 
+    />
   );
 };
