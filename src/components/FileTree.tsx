@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { ChevronRight, ChevronDown, File, Folder, FolderOpen, FileCode, FileJson, FileText, Image } from "lucide-react";
-import { FileNode } from "@/lib/api";
+import { FileNode } from "@/lib/types";
 import { cn } from "@/lib/utils";
 
 interface FileTreeProps {
@@ -12,7 +12,7 @@ interface FileTreeProps {
 
 const getFileIcon = (name: string) => {
   const ext = name.split(".").pop()?.toLowerCase();
-  
+
   switch (ext) {
     case "ts":
     case "tsx":
@@ -37,7 +37,7 @@ const getFileIcon = (name: string) => {
 
 const getFileColor = (name: string) => {
   const ext = name.split(".").pop()?.toLowerCase();
-  
+
   switch (ext) {
     case "ts":
     case "tsx":
@@ -68,7 +68,7 @@ interface FileTreeItemProps {
 
 function FileTreeItem({ node, depth, selectedPath, onSelectFile }: FileTreeItemProps) {
   const [isExpanded, setIsExpanded] = useState(depth < 2);
-  
+
   const isDirectory = node.type === "directory";
   const isSelected = selectedPath === node.path;
   const FileIcon = isDirectory ? (isExpanded ? FolderOpen : Folder) : getFileIcon(node.name);
@@ -104,7 +104,7 @@ function FileTreeItem({ node, depth, selectedPath, onSelectFile }: FileTreeItemP
         <FileIcon className={cn("w-4 h-4 shrink-0", fileColor)} />
         <span className="truncate text-sm">{node.name}</span>
       </div>
-      
+
       {isDirectory && isExpanded && node.children && (
         <div>
           {node.children.map((child) => (
