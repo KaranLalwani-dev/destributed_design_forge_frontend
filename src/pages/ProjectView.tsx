@@ -1,6 +1,6 @@
 import { useState, useCallback, useEffect, useRef } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { Code, Sparkles, LogOut, RotateCcw, Maximize2, RefreshCw, MoreVertical, Trash, Download, Edit } from "lucide-react";
+import { Code, Sparkles, LogOut, RotateCcw, Maximize2, RefreshCw, MoreVertical, Trash, Download, Edit, Home } from "lucide-react";
 import { ResizablePanelGroup, ResizablePanel, ResizableHandle } from "@/components/ui/resizable";
 import { ChatPanel, ChatMessage } from "@/components/ChatPanel";
 import { CodePanel } from "@/components/CodePanel";
@@ -288,6 +288,14 @@ Please analyze this error and fix the code to resolve it.`;
       {/* Header */}
       <header className="h-14 shrink-0 border-b border-black/5 bg-panel/30 backdrop-blur-xl flex items-center justify-between px-4 z-10 relative shadow-sm">
         <div className="flex items-center gap-2">
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={() => navigate("/projects")}
+            className="h-8 w-8 text-muted-foreground hover:text-foreground mr-1"
+          >
+            <Home className="w-4 h-4" />
+          </Button>
           {project ? (
             <>
               <div

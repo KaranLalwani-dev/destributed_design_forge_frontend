@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Play, Loader2, ExternalLink, RefreshCw, Globe } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { api, PREVIEW_URL_KEY } from "@/lib/api";
@@ -21,8 +21,8 @@ export function PreviewPanel({ projectId, runtimeError, onDismiss, onFix }: Prev
   });
   const [isDeploying, setIsDeploying] = useState(false);
   const [isPreviewReady, setIsPreviewReady] = useState(false);
-  const [iframeKey, setIframeKey] = useState(0);
   const { toast } = useToast();
+  const iframeRef = useRef<HTMLIFrameElement>(null);
 
   // Update previewUrl when projectId changes
   useEffect(() => {
@@ -38,58 +38,62 @@ export function PreviewPanel({ projectId, runtimeError, onDismiss, onFix }: Prev
     }
   }, [previewUrl, previewUrlKey]);
 
-  // Poll the preview URL to check when it's fully ready
+  // Poll the iframe content every 10 seconds to check if the placeholder text is gone
   useEffect(() => {
-    if (!previewUrl) {
-      setIsPreviewReady(false);
-      return;
-    }
+    if (!previewUrl || isPreviewReady) return;
 
-    setIsPreviewReady(false);
-    let isMounted = true;
-    let timeoutId: NodeJS.Timeout;
-    const startTime = Date.now();
-    const MAX_POLL_TIME = 30000; // 30 seconds max polling
-
-    const checkReady = async () => {
-      if (!isMounted) return;
-
-      // Fallback: If we've been polling for over 30 seconds, just show the iframe
-      if (Date.now() - startTime > MAX_POLL_TIME) {
-        setIsPreviewReady(true);
-        setIframeKey(k => k + 1);
-        return;
-      }
+    const intervalId = setInterval(() => {
+      const iframe = iframeRef.current;
+      if (!iframe) return;
 
       try {
-        const res = await fetch(previewUrl);
-        const text = await res.text();
-        
-        if (text.includes("Preview server unavailable") || text.includes("starting...")) {
-          // Still showing the proxy placeholder, keep polling
-          timeoutId = setTimeout(checkReady, 1000);
-        } else {
-          // Server is returning something else (likely the actual Vite app)
-          if (isMounted) {
-            setIsPreviewReady(true);
-            setIframeKey(k => k + 1); // remount iframe to get the fresh content
-          }
+        const doc = iframe.contentDocument || iframe.contentWindow?.document;
+        if (!doc) return;
+
+        const bodyText = doc.body?.innerText || "";
+
+        // If the placeholder text is NOT present, the server is ready
+        if (!bodyText.includes("Preview server unavailable") && !bodyText.includes("starting...")) {
+          setIsPreviewReady(true);
         }
       } catch (e) {
-        // During startup, the proxy's 502/503 page often doesn't have CORS headers,
-        // causing fetch to throw a TypeError. This means the real server isn't ready yet.
-        // We should keep polling until Vite starts (Vite sends CORS headers by default).
-        timeoutId = setTimeout(checkReady, 1000);
+        // Cross-origin error means the Vite dev server has taken over (it sets different headers).
+        // That means the real app is loaded — the server is ready.
+        setIsPreviewReady(true);
+      }
+    }, 10000);
+
+    // Also do an immediate check after the iframe first loads
+    const handleLoad = () => {
+      const iframe = iframeRef.current;
+      if (!iframe) return;
+
+      try {
+        const doc = iframe.contentDocument || iframe.contentWindow?.document;
+        if (!doc) return;
+
+        const bodyText = doc.body?.innerText || "";
+        if (!bodyText.includes("Preview server unavailable") && !bodyText.includes("starting...")) {
+          setIsPreviewReady(true);
+        }
+      } catch (e) {
+        // Cross-origin = real app loaded
+        setIsPreviewReady(true);
       }
     };
 
-    checkReady();
+    const iframe = iframeRef.current;
+    if (iframe) {
+      iframe.addEventListener("load", handleLoad);
+    }
 
     return () => {
-      isMounted = false;
-      clearTimeout(timeoutId);
+      clearInterval(intervalId);
+      if (iframe) {
+        iframe.removeEventListener("load", handleLoad);
+      }
     };
-  }, [previewUrl]);
+  }, [previewUrl, isPreviewReady]);
 
   const handleDeploy = async () => {
     setIsDeploying(true);
@@ -114,9 +118,8 @@ export function PreviewPanel({ projectId, runtimeError, onDismiss, onFix }: Prev
   };
 
   const handleRefresh = () => {
-    const iframe = document.querySelector("iframe");
-    if (iframe) {
-      iframe.src = iframe.src;
+    if (iframeRef.current) {
+      iframeRef.current.src = iframeRef.current.src;
     }
   };
 
@@ -176,16 +179,16 @@ export function PreviewPanel({ projectId, runtimeError, onDismiss, onFix }: Prev
       </div>
 
       {/* Preview Area */}
-      <div className="flex-1 bg-muted relative overflow-hidden">
-        {/* Glass Loading Screen */}
-        {previewUrl && (!isPreviewReady || isDeploying) && (
-          <div className="absolute inset-0 flex flex-col items-center justify-center bg-background/50 backdrop-blur-md z-10 animate-in fade-in duration-300">
-            <div className="flex flex-col items-center justify-center p-8 rounded-2xl bg-panel/40 border border-border shadow-[0_8px_32px_0_rgba(0,0,0,0.05)] backdrop-blur-xl">
-              <Loader2 className="w-8 h-8 text-foreground animate-spin mb-4" />
-              <h3 className="text-sm font-medium text-foreground mb-1 font-serif tracking-wide">
+      <div className="flex-1 bg-[#0a0a0a] relative overflow-hidden">
+        {/* Glass Loading Screen - shown while preview is not ready */}
+        {previewUrl && !isPreviewReady && (
+          <div className="absolute inset-0 flex flex-col items-center justify-center bg-[#0a0a0a] z-10">
+            <div className="flex flex-col items-center justify-center p-8 rounded-2xl bg-white/5 border border-white/10 shadow-[0_8px_32px_0_rgba(0,0,0,0.3)] backdrop-blur-xl">
+              <Loader2 className="w-8 h-8 text-white/70 animate-spin mb-4" />
+              <h3 className="text-sm font-medium text-white/80 mb-1 font-serif tracking-wide">
                 Preparing Environment
               </h3>
-              <p className="text-xs text-muted-foreground">
+              <p className="text-xs text-white/40">
                 Starting development server...
               </p>
             </div>
@@ -194,18 +197,18 @@ export function PreviewPanel({ projectId, runtimeError, onDismiss, onFix }: Prev
 
         {previewUrl ? (
           <iframe
-            key={iframeKey}
+            ref={iframeRef}
             src={previewUrl}
-            className={`w-full h-full border-0 transition-opacity duration-500 ${!isPreviewReady || isDeploying ? 'opacity-0' : 'opacity-100'}`}
+            className={`w-full h-full border-0 transition-opacity duration-500 ${!isPreviewReady ? 'opacity-0' : 'opacity-100'}`}
             title="Preview"
             sandbox="allow-scripts allow-same-origin allow-forms allow-popups"
           />
         ) : (
-          <div className="flex flex-col items-center justify-center h-full text-center p-8 bg-background">
-            <div className="w-16 h-16 rounded-xl bg-muted/50 flex items-center justify-center mb-4 border border-border/50">
-              <Globe className="w-8 h-8 text-muted-foreground/40" />
+          <div className="flex flex-col items-center justify-center h-full text-center p-8">
+            <div className="w-16 h-16 rounded-xl bg-white/5 flex items-center justify-center mb-4 border border-white/10">
+              <Globe className="w-8 h-8 text-white/30" />
             </div>
-            <p className="text-sm text-muted-foreground font-serif">
+            <p className="text-sm text-white/40 font-serif tracking-wide">
               No preview available yet
             </p>
           </div>
