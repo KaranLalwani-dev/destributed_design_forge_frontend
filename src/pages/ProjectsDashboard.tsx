@@ -142,14 +142,8 @@ export function ProjectsDashboard() {
     return (
         <div className="min-h-screen bg-background">
             {/* Header */}
-            <header className="border-b border-border/40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-                <div className="container flex h-14 max-w-screen-2xl items-center justify-between px-4 sm:px-8">
-                    <div className="flex items-center gap-2 font-bold text-lg">
-                        <div className="w-8 h-8 rounded-lg bg-primary/20 flex items-center justify-center">
-                            <Folder className="w-5 h-5 text-primary" />
-                        </div>
-                        Project Companion
-                    </div>
+            <header className="border-b border-black/5 bg-background/60 backdrop-blur-2xl">
+                <div className="container flex h-16 max-w-screen-2xl items-center justify-end px-4 sm:px-8">
                     <DropdownMenu>
                         <DropdownMenuTrigger asChild>
                             <Button variant="ghost" size="icon" className="h-9 w-9 rounded-full">
@@ -195,7 +189,7 @@ export function ProjectsDashboard() {
 
                     <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
                         <DialogTrigger asChild>
-                            <Button className="gap-2">
+                            <Button className="gap-2 rounded-full shadow-glow">
                                 <Plus className="w-4 h-4" />
                                 New Project
                             </Button>
@@ -251,14 +245,17 @@ export function ProjectsDashboard() {
                 </div>
 
                 {/* Search */}
-                <div className="relative mb-8 max-w-md">
-                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-                    <Input
-                        placeholder="Search projects..."
-                        className="pl-9"
-                        value={searchQuery}
-                        onChange={(e) => setSearchQuery(e.target.value)}
-                    />
+                <div className="relative mb-10 max-w-md group">
+                    <div className="absolute -inset-1 bg-gradient-to-r from-primary/20 to-primary/0 rounded-full blur opacity-0 group-hover:opacity-100 transition duration-500"></div>
+                    <div className="relative">
+                        <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                        <Input
+                            placeholder="Search projects..."
+                            className="pl-11 rounded-full bg-panel/40 backdrop-blur-xl border-black/5 h-12 focus-visible:ring-primary/50 transition-colors"
+                            value={searchQuery}
+                            onChange={(e) => setSearchQuery(e.target.value)}
+                        />
+                    </div>
                 </div>
 
                 {/* Grid */}
@@ -281,11 +278,11 @@ export function ProjectsDashboard() {
                         {filteredProjects.map((project) => (
                             <Card
                                 key={project.id}
-                                className="group cursor-pointer hover:shadow-lg transition-all hover:border-primary/50"
+                                className="group cursor-pointer transition-all duration-300 hover:scale-[1.02] border-black/5 bg-panel/40 backdrop-blur-2xl shadow-panel hover:shadow-glow overflow-hidden rounded-2xl"
                                 onClick={() => navigate(`/projects/${project.id}`)}
                             >
                                 <CardHeader className="p-0">
-                                    <div className="aspect-video bg-muted/50 w-full relative overflow-hidden rounded-t-lg">
+                                    <div className="aspect-video bg-black/5 w-full relative overflow-hidden">
                                         {project.thumbnailUrl ? (
                                             <img
                                                 src={project.thumbnailUrl}

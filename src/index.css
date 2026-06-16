@@ -4,10 +4,10 @@
 
 @layer base {
   :root {
-    --background: 0 0% 100%;
+    --background: 0 0% 98%;
     --foreground: 0 0% 0%;
 
-    --card: 0 0% 98%;
+    --card: 0 0% 100%;
     --card-foreground: 0 0% 0%;
 
     --popover: 0 0% 100%;
@@ -32,24 +32,24 @@
     --input: 0 0% 90%;
     --ring: 0 0% 0%;
 
-    --radius: 0.3rem;
+    --radius: 1.25rem;
 
     /* Custom tokens */
-    --panel: 0 0% 98%;
-    --panel-hover: 0 0% 95%;
-    --panel-active: 0 0% 90%;
-    --chat-user: 0 0% 90%;
-    --chat-ai: 0 0% 95%;
-    --file-active: 0 0% 90%;
-    --syntax-keyword: 0 0% 20%;
-    --syntax-string: 0 0% 30%;
-    --syntax-number: 0 0% 40%;
+    --panel: 0 0% 100%;
+    --panel-hover: 0 0% 97%;
+    --panel-active: 0 0% 94%;
+    --chat-user: 0 0% 95%;
+    --chat-ai: 0 0% 100%;
+    --file-active: 0 0% 95%;
+    --syntax-keyword: 280 80% 50%;
+    --syntax-string: 120 60% 40%;
+    --syntax-number: 30 80% 50%;
     --syntax-comment: 0 0% 60%;
-    --syntax-function: 0 0% 10%;
+    --syntax-function: 210 80% 50%;
     --gradient-primary: linear-gradient(135deg, hsl(0 0% 0%) 0%, hsl(0 0% 30%) 100%);
-    --gradient-panel: linear-gradient(180deg, hsl(0 0% 98%) 0%, hsl(0 0% 100%) 100%);
-    --shadow-glow: 0 0 20px hsl(0 0% 0% / 0.1);
-    --shadow-panel: 0 4px 24px hsl(0 0% 0% / 0.1);
+    --gradient-panel: linear-gradient(180deg, hsl(var(--panel)/0.4) 0%, hsl(var(--panel)/0.8) 100%);
+    --shadow-glow: 0 0 40px hsl(0 0% 0% / 0.05);
+    --shadow-panel: 0 8px 32px hsl(0 0% 0% / 0.06);
   }
 }
 
@@ -65,8 +65,8 @@
 
   /* Scrollbar styling */
   ::-webkit-scrollbar {
-    width: 8px;
-    height: 8px;
+    width: 6px;
+    height: 6px;
   }
 
   ::-webkit-scrollbar-track {
@@ -78,14 +78,16 @@
   }
 
   ::-webkit-scrollbar-thumb:hover {
-    @apply bg-muted-foreground/30;
+    @apply bg-muted-foreground/50;
   }
 }
 
 @layer components {
   .glass-panel {
-    @apply bg-panel border border-border/50 backdrop-blur-sm;
+    @apply bg-panel/40 backdrop-blur-2xl border-white/5;
     box-shadow: var(--shadow-panel);
+    border-width: 1px;
+    border-style: solid;
   }
 
   .gradient-text {
@@ -100,11 +102,11 @@
   }
 
   .streaming-cursor {
-    @apply inline-block w-2 h-5 bg-primary animate-pulse ml-0.5;
+    @apply inline-block w-2 h-5 bg-primary animate-pulse ml-0.5 rounded-full;
   }
 
   .file-tree-item {
-    @apply flex items-center gap-2 px-2 py-1.5 rounded-md cursor-pointer transition-colors;
+    @apply flex items-center gap-2 px-3 py-2 rounded-xl cursor-pointer transition-colors;
     @apply hover:bg-panel-hover text-muted-foreground hover:text-foreground;
   }
 
@@ -113,15 +115,16 @@
   }
 
   .chat-message {
-    @apply p-4 rounded-lg max-w-[85%] animate-fade-in;
+    @apply p-4 rounded-2xl max-w-[85%] animate-fade-in;
+    box-shadow: 0 4px 12px hsl(0 0% 0% / 0.1);
   }
 
   .chat-message.user {
-    @apply bg-chat-user ml-auto;
+    @apply bg-chat-user ml-auto border border-white/5;
   }
 
   .chat-message.ai {
-    @apply bg-chat-ai mr-auto;
+    @apply bg-chat-ai mr-auto border border-white/5;
   }
 
   .code-line {
@@ -129,26 +132,26 @@
   }
 
   .panel-header {
-    @apply h-12 flex items-center justify-between px-4 border-b border-border/50 bg-panel;
+    @apply h-14 flex items-center justify-between px-4 border-b border-white/5 bg-panel/30 backdrop-blur-md;
   }
 
   .tab-button {
-    @apply px-4 py-2 text-sm font-medium transition-all rounded-md;
+    @apply px-4 py-2 text-sm font-medium transition-all rounded-xl;
     @apply text-muted-foreground hover:text-foreground hover:bg-panel-hover;
   }
 
   .tab-button.active {
-    @apply bg-primary/20 text-primary;
+    @apply bg-primary/10 text-primary glow-effect;
   }
 }
 
 @layer utilities {
   .animate-fade-in {
-    animation: fadeIn 0.3s ease-out;
+    animation: fadeIn 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
   }
 
   .animate-slide-up {
-    animation: slideUp 0.3s ease-out;
+    animation: slideUp 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
   }
 
   .animate-stream {
@@ -158,22 +161,22 @@
   @keyframes fadeIn {
     from {
       opacity: 0;
-      transform: translateY(8px);
+      transform: translateY(4px) scale(0.98);
     }
     to {
       opacity: 1;
-      transform: translateY(0);
+      transform: translateY(0) scale(1);
     }
   }
 
   @keyframes slideUp {
     from {
       opacity: 0;
-      transform: translateY(20px);
+      transform: translateY(24px) scale(0.95);
     }
     to {
       opacity: 1;
-      transform: translateY(0);
+      transform: translateY(0) scale(1);
     }
   }
 

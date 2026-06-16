@@ -286,7 +286,7 @@ Please analyze this error and fix the code to resolve it.`;
   return (
     <div className="h-screen flex flex-col overflow-hidden bg-background">
       {/* Header */}
-      <header className="h-12 shrink-0 border-b border-border/50 bg-panel flex items-center justify-between px-3">
+      <header className="h-14 shrink-0 border-b border-black/5 bg-panel/30 backdrop-blur-xl flex items-center justify-between px-4 z-10 relative shadow-sm">
         <div className="flex items-center gap-2">
           {project ? (
             <>
@@ -334,12 +334,12 @@ Please analyze this error and fix the code to resolve it.`;
           
 
           {/* View Mode Toggle */}
-          <div className="flex items-center bg-muted/30 rounded-lg p-0.5 mx-2">
+          <div className="flex items-center bg-black/5 backdrop-blur-md border border-black/5 rounded-full p-1 mx-2 shadow-inner">
             <button
               onClick={() => setViewMode("preview")}
-              className={`flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium transition-all rounded-md ${viewMode === "preview"
-                ? "bg-primary text-primary-foreground"
-                : "text-muted-foreground hover:text-foreground"
+              className={`flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium transition-all rounded-full ${viewMode === "preview"
+                ? "bg-primary text-primary-foreground shadow-glow"
+                : "text-muted-foreground hover:text-foreground hover:bg-black/5"
                 }`}
             >
               <Sparkles className="w-3 h-3" />
@@ -347,9 +347,9 @@ Please analyze this error and fix the code to resolve it.`;
             </button>
             <button
               onClick={() => setViewMode("code")}
-              className={`flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium transition-all rounded-md ${viewMode === "code"
-                ? "bg-primary text-primary-foreground"
-                : "text-muted-foreground hover:text-foreground"
+              className={`flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium transition-all rounded-full ${viewMode === "code"
+                ? "bg-primary text-primary-foreground shadow-glow"
+                : "text-muted-foreground hover:text-foreground hover:bg-black/5"
                 }`}
             >
               <Code className="w-3 h-3" />
@@ -388,18 +388,15 @@ Please analyze this error and fix the code to resolve it.`;
           <ShareDialog
             projectId={projectId}
             trigger={
-              <Button variant="outline" size="sm" className="h-8 text-xs font-medium" disabled={project?.role === 'VIEWER'}>
+              <Button variant="outline" size="sm" className="h-8 text-xs font-medium rounded-full border-black/10 bg-panel/30 backdrop-blur-md hover:bg-panel/60" disabled={project?.role === 'VIEWER'}>
                 Share
               </Button>
             }
           />
           {project?.role !== 'VIEWER' && (
             <>
-              <Button variant="outline" size="sm" className="h-8 text-xs">
+              <Button variant="outline" size="sm" className="h-8 text-xs rounded-full border-black/10 bg-panel/30 backdrop-blur-md hover:bg-panel/60">
                 Upgrade
-              </Button>
-              <Button size="sm" className="h-8 text-xs bg-primary hover:bg-primary/90">
-                Publish
               </Button>
             </>
           )}

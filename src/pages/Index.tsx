@@ -24,10 +24,10 @@ const Index = () => {
       </div>
 
       <div className="relative flex flex-col items-center">
-        <div className="w-20 h-20 rounded-2xl bg-primary/20 flex items-center justify-center mb-6 glow-effect">
+        <div className="w-24 h-24 rounded-full bg-primary/10 flex items-center justify-center mb-8 shadow-glow border border-primary/20 backdrop-blur-xl">
           <Sparkles className="w-10 h-10 text-primary" />
         </div>
-        <h1 className="text-3xl font-bold gradient-text mb-4">Design Forge</h1>
+        <h1 className="text-4xl font-bold gradient-text mb-4 tracking-tight">Design Forge</h1>
         <div className="flex items-center gap-2 text-muted-foreground">
           <Loader2 className="w-4 h-4 animate-spin" />
           <span>Loading...</span>
