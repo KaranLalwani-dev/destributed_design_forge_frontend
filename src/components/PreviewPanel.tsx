@@ -48,27 +48,38 @@ export function PreviewPanel({ projectId, runtimeError, onDismiss, onFix }: Prev
     setIsPreviewReady(false);
     let isMounted = true;
     let timeoutId: NodeJS.Timeout;
+    const startTime = Date.now();
+    const MAX_POLL_TIME = 30000; // 30 seconds max polling
 
     const checkReady = async () => {
       if (!isMounted) return;
+
+      // Fallback: If we've been polling for over 30 seconds, just show the iframe
+      if (Date.now() - startTime > MAX_POLL_TIME) {
+        setIsPreviewReady(true);
+        setIframeKey(k => k + 1);
+        return;
+      }
+
       try {
         const res = await fetch(previewUrl);
         const text = await res.text();
         
-        if (text.includes("Preview server unavailable") || text.includes("starting")) {
+        if (text.includes("Preview server unavailable") || text.includes("starting...")) {
+          // Still showing the proxy placeholder, keep polling
           timeoutId = setTimeout(checkReady, 1000);
         } else {
+          // Server is returning something else (likely the actual Vite app)
           if (isMounted) {
             setIsPreviewReady(true);
             setIframeKey(k => k + 1); // remount iframe to get the fresh content
           }
         }
       } catch (e) {
-        // If fetch fails (e.g. CORS from the real Vite server), we assume it's ready
-        if (isMounted) {
-          setIsPreviewReady(true);
-          setIframeKey(k => k + 1);
-        }
+        // During startup, the proxy's 502/503 page often doesn't have CORS headers,
+        // causing fetch to throw a TypeError. This means the real server isn't ready yet.
+        // We should keep polling until Vite starts (Vite sends CORS headers by default).
+        timeoutId = setTimeout(checkReady, 1000);
       }
     };
 
