@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
-import { ParticleAnimation } from "@/components/ParticleAnimation";
+import { FluidBackground } from "@/components/FluidBackground";
 
 export default function Signup() {
     const [name, setName] = useState("");
@@ -52,7 +52,7 @@ export default function Signup() {
 
     return (
         <div className="min-h-screen flex items-center justify-center p-4 sm:p-6 bg-background overflow-hidden relative">
-            <ParticleAnimation />
+            <FluidBackground />
 
             <div className="relative z-10 w-full max-w-md">
                 {/* Card */}
