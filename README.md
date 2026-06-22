@@ -4,6 +4,24 @@
 
 DesignForge is an AI-powered system design platform that helps engineers create, visualize, and iterate on distributed system architectures. This repository contains the React + Vite frontend that interfaces with the DesignForge microservices backend.
 
+<img width="1710" height="1107" alt="image" src="https://github.com/user-attachments/assets/41b69dd2-54e1-486e-8d81-fb695777fa2b" />
+
+<img width="1710" height="1107" alt="image" src="https://github.com/user-attachments/assets/4ca80963-f097-48e7-a3fd-cfd7cdff348a" />
+
+<img width="1710" height="1107" alt="image" src="https://github.com/user-attachments/assets/fd8b00cb-f8a0-49c0-8ecf-0a0002670d21" />
+
+<img width="1710" height="1107" alt="image" src="https://github.com/user-attachments/assets/834e476c-b20f-402c-9fd5-deb79f3f0394" />
+
+<img width="1710" height="1107" alt="image" src="https://github.com/user-attachments/assets/4873b610-5da4-4f68-88d5-f049c7b6e437" />
+
+<img width="1710" height="1107" alt="image" src="https://github.com/user-attachments/assets/8dcdddeb-ed4f-4db5-bb5f-0f472df7e1e7" />
+
+<img width="1710" height="1106" alt="image" src="https://github.com/user-attachments/assets/502e1bd0-9aee-455a-a21d-25e251f5c049" />
+
+<img width="1710" height="1107" alt="image" src="https://github.com/user-attachments/assets/8b3d9266-33d7-4523-b651-838d53a39748" />
+
+<img width="1710" height="1107" alt="image" src="https://github.com/user-attachments/assets/dd737952-a3fa-4351-bdad-724309dc586c" />
+
 ## Tech Stack
 
 - **Vite** — build tool and dev server with HMR
