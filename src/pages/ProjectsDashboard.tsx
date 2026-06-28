@@ -171,9 +171,13 @@ export function ProjectsDashboard() {
                                     setIsBillingLoading(true);
                                     try {
                                         const res = await api.openCustomerPortal();
-                                        if (res?.portalUrl) window.location.href = res.portalUrl;
+                                        if (res?.portalUrl && !res.portalUrl.includes("invalid/")) {
+                                            window.location.href = res.portalUrl;
+                                        } else {
+                                            throw new Error("Invalid portal URL");
+                                        }
                                     } catch (e) {
-                                        toast({ title: "Error", description: "Failed to open billing portal", variant: "destructive" });
+                                        toast({ title: "Error", description: "You don't have an active subscription to manage.", variant: "destructive" });
                                     } finally {
                                         setIsBillingLoading(false);
                                     }

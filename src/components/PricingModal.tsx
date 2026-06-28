@@ -18,10 +18,10 @@ export function PricingModal({ open, onOpenChange }: PricingModalProps) {
     setLoading(planId);
     try {
       const response = await api.createCheckoutSession(planId);
-      if (response && response.checkoutUrl) {
+      if (response && response.checkoutUrl && !response.checkoutUrl.includes("invalid/")) {
         window.location.href = response.checkoutUrl;
       } else {
-        throw new Error("Invalid checkout response");
+        throw new Error("Could not initiate checkout. Please try again.");
       }
     } catch (error) {
       console.error("Failed to start checkout", error);
