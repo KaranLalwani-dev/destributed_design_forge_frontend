@@ -406,6 +406,40 @@ export const api = {
       });
 
     return () => controller.abort();
-  }
+  },
 
+  // --- Billing API ---
+  async getMySubscription(): Promise<import('./types').SubscriptionResponse | null> {
+    const response = await fetch(`${BASE_URL}/api/me/subscription`, {
+      headers: getAuthHeaders(),
+    });
+    if (!response.ok) {
+      if (response.status === 404) return null;
+      throw new Error("Failed to fetch subscription");
+    }
+    if (response.status === 204) return null;
+    
+    const text = await response.text();
+    if (!text) return null;
+    return JSON.parse(text);
+  },
+
+  async createCheckoutSession(planId: number): Promise<import('./types').CheckoutResponse> {
+    const response = await fetch(`${BASE_URL}/api/payments/checkout`, {
+      method: "POST",
+      headers: { ...getAuthHeaders(), "Content-Type": "application/json" },
+      body: JSON.stringify({ planId }),
+    });
+    if (!response.ok) throw new Error("Failed to create checkout session");
+    return response.json();
+  },
+
+  async openCustomerPortal(): Promise<import('./types').PortalResponse> {
+    const response = await fetch(`${BASE_URL}/api/payments/portal`, {
+      method: "POST",
+      headers: getAuthHeaders(),
+    });
+    if (!response.ok) throw new Error("Failed to open customer portal");
+    return response.json();
+  }
 };

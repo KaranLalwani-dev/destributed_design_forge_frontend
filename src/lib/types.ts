@@ -106,3 +106,25 @@ export interface AuthResponse {
     plan?: any;
   };
 }
+
+export type SubscriptionStatus = 'ACTIVE' | 'TRIALING' | 'PAST_DUE' | 'CANCELED' | 'INCOMPLETE' | 'FREE';
+
+export interface SubscriptionResponse {
+  id?: number;
+  userId: number;
+  planId?: number;
+  stripeSubscriptionId?: string;
+  stripeCustomerId?: string;
+  status: SubscriptionStatus;
+  currentPeriodStart?: string;
+  currentPeriodEnd?: string;
+  cancelAtPeriodEnd?: boolean;
+}
+
+export interface CheckoutResponse {
+  url: string;
+}
+
+export interface PortalResponse {
+  url: string;
+}

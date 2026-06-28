@@ -7,10 +7,11 @@ import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/componen
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { api, removeAuthToken, removeUserInfo, getUserInfo } from "@/lib/api";
-import { ProjectSummaryResponse } from "@/lib/types";
+import { ProjectSummaryResponse, SubscriptionResponse } from "@/lib/types";
 import { useToast } from "@/hooks/use-toast";
 import { generateGradient, cn } from "@/lib/utils";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { PricingModal } from "@/components/PricingModal";
 
 export function ProjectsDashboard() {
     const navigate = useNavigate();
@@ -27,14 +28,23 @@ export function ProjectsDashboard() {
     const [projectToRename, setProjectToRename] = useState<ProjectSummaryResponse | null>(null);
     const [renameName, setRenameName] = useState("");
 
+    // Billing state
+    const [subscription, setSubscription] = useState<SubscriptionResponse | null>(null);
+    const [isPricingModalOpen, setIsPricingModalOpen] = useState(false);
+    const [isBillingLoading, setIsBillingLoading] = useState(false);
+
     useEffect(() => {
         fetchProjects();
     }, []);
 
     const fetchProjects = async () => {
         try {
-            const data = await api.getProjects();
-            setProjects(data);
+            const [projectsData, subData] = await Promise.all([
+                api.getProjects(),
+                api.getMySubscription().catch(() => null)
+            ]);
+            setProjects(projectsData);
+            setSubscription(subData);
         } catch (error) {
             console.error("Failed to fetch projects:", error);
             toast({
@@ -152,7 +162,37 @@ export function ProjectsDashboard() {
                     </div>
                     
                     <div className="flex items-center gap-4">
-                    <DropdownMenu>
+                        {subscription && subscription.status === 'ACTIVE' ? (
+                            <Button
+                                variant="outline"
+                                size="sm"
+                                className="h-8 text-xs rounded-full border-primary/20 bg-primary/5 text-primary hover:bg-primary/10 transition-colors hidden sm:flex"
+                                onClick={async () => {
+                                    setIsBillingLoading(true);
+                                    try {
+                                        const res = await api.openCustomerPortal();
+                                        if (res?.url) window.location.href = res.url;
+                                    } catch (e) {
+                                        toast({ title: "Error", description: "Failed to open billing portal", variant: "destructive" });
+                                    } finally {
+                                        setIsBillingLoading(false);
+                                    }
+                                }}
+                                disabled={isBillingLoading}
+                            >
+                                {isBillingLoading ? "Redirecting..." : "Manage Billing"}
+                            </Button>
+                        ) : (
+                            <Button
+                                variant="outline"
+                                size="sm"
+                                className="h-8 text-xs rounded-full border-border bg-background shadow-sm hover:bg-accent hidden sm:flex"
+                                onClick={() => setIsPricingModalOpen(true)}
+                            >
+                                Upgrade Plan
+                            </Button>
+                        )}
+                        <DropdownMenu>
                         <DropdownMenuTrigger asChild>
                             <Button variant="ghost" size="icon" className="h-9 w-9 rounded-full">
                                 <Avatar className="h-9 w-9">
@@ -354,6 +394,8 @@ export function ProjectsDashboard() {
                     </div>
                 )}
             </main>
+            
+            <PricingModal open={isPricingModalOpen} onOpenChange={setIsPricingModalOpen} />
         </div>
     );
 }

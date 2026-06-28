@@ -15,9 +15,9 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
 import { RuntimeErrorAlert, RuntimeError } from "@/components/RuntimeErrorAlert";
 import { generateGradient, cn } from "@/lib/utils";
-import { ProjectResponse } from "@/lib/types";
+import { ProjectResponse, SubscriptionResponse } from "@/lib/types";
 import { ShareDialog } from "@/components/ShareDialog";
-
+import { PricingModal } from "@/components/PricingModal";
 type ViewMode = "code" | "preview";
 
 export function ProjectView() {
@@ -32,7 +32,9 @@ export function ProjectView() {
   const [isLoadingHistory, setIsLoadingHistory] = useState(true);
   const [runtimeError, setRuntimeError] = useState<RuntimeError | null>(null);
   const [project, setProject] = useState<ProjectResponse | null>(null);
-
+  const [subscription, setSubscription] = useState<SubscriptionResponse | null>(null);
+  const [isPricingModalOpen, setIsPricingModalOpen] = useState(false);
+  const [isBillingLoading, setIsBillingLoading] = useState(false);
   // Rename state
   const [isRenameDialogOpen, setIsRenameDialogOpen] = useState(false);
   const [renameName, setRenameName] = useState("");
@@ -54,9 +56,10 @@ export function ProjectView() {
     const loadData = async () => {
       setIsLoadingHistory(true);
       try {
-        const [history, projectData] = await Promise.all([
+        const [history, projectData, subData] = await Promise.all([
           api.getChatHistory(projectId),
-          api.getProject(projectId)
+          api.getProject(projectId),
+          api.getMySubscription().catch(() => null)
         ]);
 
         const formattedMessages: ChatMessage[] = history.map((msg) => ({
@@ -68,6 +71,7 @@ export function ProjectView() {
         }));
         setMessages(formattedMessages);
         setProject(projectData);
+        setSubscription(subData);
       } catch (error) {
         console.error("Failed to load project data:", error);
         toast({
@@ -403,9 +407,36 @@ Please analyze this error and fix the code to resolve it.`;
           />
           {project?.role !== 'VIEWER' && (
             <>
-              <Button variant="outline" size="sm" className="h-8 text-xs rounded-full border-black/10 bg-panel/30 backdrop-blur-md hover:bg-panel/60">
-                Upgrade
-              </Button>
+              {subscription && subscription.status === 'ACTIVE' ? (
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="h-8 text-xs rounded-full border-primary/20 bg-primary/5 text-primary hover:bg-primary/10 transition-colors"
+                  onClick={async () => {
+                    setIsBillingLoading(true);
+                    try {
+                      const res = await api.openCustomerPortal();
+                      if (res?.url) window.location.href = res.url;
+                    } catch (e) {
+                      toast({ title: "Error", description: "Failed to open billing portal", variant: "destructive" });
+                    } finally {
+                      setIsBillingLoading(false);
+                    }
+                  }}
+                  disabled={isBillingLoading}
+                >
+                  {isBillingLoading ? "Redirecting..." : "Manage Billing"}
+                </Button>
+              ) : (
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="h-8 text-xs rounded-full border-black/10 bg-panel/30 backdrop-blur-md hover:bg-panel/60"
+                  onClick={() => setIsPricingModalOpen(true)}
+                >
+                  Upgrade
+                </Button>
+              )}
             </>
           )}
           <Button
@@ -418,6 +449,8 @@ Please analyze this error and fix the code to resolve it.`;
           </Button>
         </div>
       </header>
+
+      <PricingModal open={isPricingModalOpen} onOpenChange={setIsPricingModalOpen} />
 
       {/* Main Content */}
       <div className="flex-1 overflow-hidden">
