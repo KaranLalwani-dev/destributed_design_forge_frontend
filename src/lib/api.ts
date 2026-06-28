@@ -247,32 +247,65 @@ export const api = {
       throw new Error("Failed to fetch project members");
     }
 
-    return response.json();
+    const data = await response.json();
+    console.log("MEMBERS RESPONSE:", data);
+    const currentUser = getUserInfo();
+    
+    return data.map((member: any) => {
+      let username = member.username;
+      let name = member.name;
+      
+      // If backend omits user details and it's the current user, fill it in
+      if (!username && currentUser && currentUser.id === member.userId) {
+        username = currentUser.username;
+        name = currentUser.name;
+      }
+      
+      return {
+        ...member,
+        username: username || `User ${member.userId}`,
+        name: name || `User ${member.userId}`,
+        role: member.projectRole || member.role
+      };
+    });
   },
 
-  async inviteMember(projectId: string, username: string, role: ProjectRole): Promise<void> {
+  async inviteMember(projectId: string, username: string, role: ProjectRole): Promise<ProjectMember> {
     const response = await fetch(`${BASE_URL}/api/v1/workspace/projects/${projectId}/members`, {
       method: "POST",
-      headers: { "Content-Type": "application/json", ...getAuthHeaders() },
+      headers: { ...getAuthHeaders(), "Content-Type": "application/json" },
       body: JSON.stringify({ username, role }),
     });
 
     if (!response.ok) {
-      const error = await response.text();
-      throw new Error(error || "Failed to invite member");
+      throw new Error("Failed to invite member");
     }
+
+    const data = await response.json();
+    return {
+      ...data,
+      username: data.username || username, // We know the username we just invited
+      name: data.name || username,
+      role: data.projectRole || data.role
+    };
   },
 
-  async updateMemberRole(projectId: string, userId: number, role: ProjectRole): Promise<void> {
-    const response = await fetch(`${BASE_URL}/api/v1/workspace/projects/${projectId}/members/${userId}`, {
+  async updateMemberRole(projectId: string, memberId: number, role: ProjectRole): Promise<ProjectMember> {
+    const response = await fetch(`${BASE_URL}/api/v1/workspace/projects/${projectId}/members/${memberId}`, {
       method: "PATCH",
-      headers: { "Content-Type": "application/json", ...getAuthHeaders() },
+      headers: { ...getAuthHeaders(), "Content-Type": "application/json" },
       body: JSON.stringify({ role }),
     });
 
     if (!response.ok) {
-      throw new Error("Failed to update member role");
+      throw new Error("Failed to update role");
     }
+
+    const data = await response.json();
+    return {
+      ...data,
+      role: data.projectRole || data.role
+    };
   },
 
   async removeMember(projectId: string, userId: number): Promise<void> {

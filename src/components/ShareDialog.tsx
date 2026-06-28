@@ -90,10 +90,10 @@ export function ShareDialog({ projectId, trigger, open, onOpenChange }: ShareDia
     return (
         <Dialog open={isOpen} onOpenChange={handleOpenChange}>
             {trigger && <DialogTrigger asChild>{trigger}</DialogTrigger>}
-            <DialogContent className="sm:max-w-md gap-0 p-0 overflow-hidden border-none shadow-2xl">
+            <DialogContent className="sm:max-w-md gap-0 p-0 overflow-hidden bg-background/95 backdrop-blur-xl border border-white/10 shadow-2xl">
                 <div className="p-6 pb-4">
                     <DialogHeader className="mb-4">
-                        <DialogTitle className="text-xl">Share project</DialogTitle>
+                        <DialogTitle className="text-xl font-semibold tracking-tight">Share project</DialogTitle>
                     </DialogHeader>
 
                     {/* Invite Section */}
@@ -101,7 +101,7 @@ export function ShareDialog({ projectId, trigger, open, onOpenChange }: ShareDia
                         <div className="flex gap-2">
                             <Input
                                 placeholder="Email or username"
-                                className="flex-1 bg-muted/50 border-input/50"
+                                className="flex-1 bg-white/5 border-white/10 text-foreground placeholder:text-muted-foreground focus-visible:ring-primary/50"
                                 value={inviteEmail}
                                 onChange={(e) => setInviteEmail(e.target.value)}
                                 onKeyDown={(e) => e.key === "Enter" && handleInvite()}
@@ -109,16 +109,16 @@ export function ShareDialog({ projectId, trigger, open, onOpenChange }: ShareDia
                             <Button
                                 onClick={handleInvite}
                                 disabled={!inviteEmail.trim() || loading}
-                                className="px-6"
+                                className="px-6 font-medium"
                             >
                                 Invite
                             </Button>
                         </div>
                         <Select value={inviteRole} onValueChange={(val) => setInviteRole(val as ProjectRole)}>
-                            <SelectTrigger className="w-full bg-muted/50 border-input/50">
+                            <SelectTrigger className="w-full bg-white/5 border-white/10 text-foreground focus:ring-primary/50">
                                 <SelectValue />
                             </SelectTrigger>
-                            <SelectContent>
+                            <SelectContent className="bg-background/95 backdrop-blur-xl border-white/10">
                                 <SelectItem value="VIEWER">Can view</SelectItem>
                                 <SelectItem value="EDITOR">Can edit</SelectItem>
                                 <SelectItem value="OWNER">Owner</SelectItem>
@@ -132,32 +132,32 @@ export function ShareDialog({ projectId, trigger, open, onOpenChange }: ShareDia
 
                         <div className="space-y-2 max-h-[300px] overflow-y-auto pr-1">
                             {members.length === 0 && (
-                                <div className="flex items-center gap-3 p-2 rounded-lg bg-muted/30">
-                                    <Avatar className="h-9 w-9">
-                                        <AvatarFallback>ME</AvatarFallback>
+                                <div className="flex items-center gap-3 p-3 rounded-xl bg-white/5 border border-white/5">
+                                    <Avatar className="h-10 w-10 ring-1 ring-white/10">
+                                        <AvatarFallback className="bg-primary/20 text-primary">ME</AvatarFallback>
                                     </Avatar>
                                     <div className="flex-1 text-sm">
-                                        <div className="font-medium">You</div>
+                                        <div className="font-medium text-foreground">You</div>
                                         <div className="text-xs text-muted-foreground">Owner</div>
                                     </div>
-                                    <span className="text-xs text-muted-foreground px-2">Owner</span>
+                                    <span className="text-xs font-medium text-muted-foreground px-2">Owner</span>
                                 </div>
                             )}
 
                             {Array.isArray(members) && members.map(member => (
-                                <div key={member.userId} className="flex items-center gap-3 p-2 rounded-lg hover:bg-muted/50 transition-colors">
-                                    <Avatar className="h-9 w-9">
-                                        <AvatarFallback className="text-xs font-medium">
+                                <div key={member.userId} className="flex items-center gap-3 p-3 rounded-xl bg-white/5 border border-white/5 hover:bg-white/10 transition-all duration-200">
+                                    <Avatar className="h-10 w-10 ring-1 ring-white/10">
+                                        <AvatarFallback className="bg-primary/20 text-primary text-sm font-medium">
                                             {member.name ? member.name.charAt(0).toUpperCase() : (member.username || "U").slice(0, 2).toUpperCase()}
                                         </AvatarFallback>
                                     </Avatar>
                                     <div className="flex-1 min-w-0 text-sm">
-                                        <div className="font-medium truncate">{member.name || member.username}</div>
+                                        <div className="font-medium text-foreground truncate">{member.name || member.username}</div>
                                         <div className="text-xs text-muted-foreground truncate">{member.username}</div>
                                     </div>
 
                                     {member.role === 'OWNER' ? (
-                                        <span className="text-xs text-muted-foreground px-2 whitespace-nowrap">Owner</span>
+                                        <span className="text-xs font-medium text-muted-foreground px-2 whitespace-nowrap">Owner</span>
                                     ) : (
                                         <Select
                                             defaultValue={member.role}
@@ -166,13 +166,13 @@ export function ShareDialog({ projectId, trigger, open, onOpenChange }: ShareDia
                                                 else handleRoleChange(member.userId, val as ProjectRole);
                                             }}
                                         >
-                                            <SelectTrigger className="h-8 w-[100px] text-xs border-none bg-transparent hover:bg-muted focus:ring-1 shadow-none">
+                                            <SelectTrigger className="h-8 w-[100px] text-xs border-white/10 bg-white/5 hover:bg-white/10 focus:ring-1 focus:ring-primary/50 shadow-none transition-colors">
                                                 <SelectValue />
                                             </SelectTrigger>
-                                            <SelectContent align="end">
+                                            <SelectContent align="end" className="bg-background/95 backdrop-blur-xl border-white/10">
                                                 <SelectItem value="EDITOR">Can edit</SelectItem>
                                                 <SelectItem value="VIEWER">Can view</SelectItem>
-                                                <SelectItem value="REMOVE" className="text-destructive focus:text-destructive">Remove</SelectItem>
+                                                <SelectItem value="REMOVE" className="text-red-400 focus:text-red-300 focus:bg-red-400/10">Remove</SelectItem>
                                             </SelectContent>
                                         </Select>
                                     )}
