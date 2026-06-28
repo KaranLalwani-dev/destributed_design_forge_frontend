@@ -42,7 +42,7 @@ export default function Signup() {
         } catch (error) {
             toast({
                 title: "Signup failed",
-                description: error instanceof Error ? error.message : "Could not create account",
+                description: "That email might already be taken, or something went wrong. Please try again.",
                 variant: "destructive",
             });
         } finally {

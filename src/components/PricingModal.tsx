@@ -18,8 +18,8 @@ export function PricingModal({ open, onOpenChange }: PricingModalProps) {
     setLoading(planId);
     try {
       const response = await api.createCheckoutSession(planId);
-      if (response && response.url) {
-        window.location.href = response.url;
+      if (response && response.checkoutUrl) {
+        window.location.href = response.checkoutUrl;
       } else {
         throw new Error("Invalid checkout response");
       }

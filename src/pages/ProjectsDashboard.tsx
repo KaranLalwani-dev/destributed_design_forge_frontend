@@ -49,7 +49,7 @@ export function ProjectsDashboard() {
             console.error("Failed to fetch projects:", error);
             toast({
                 title: "Error",
-                description: "Failed to load projects. Please try again.",
+                description: "We couldn't load your projects right now. Please refresh the page.",
                 variant: "destructive",
             });
         } finally {
@@ -68,7 +68,7 @@ export function ProjectsDashboard() {
             setIsDialogOpen(false);
             toast({
                 title: "Success",
-                description: "Project created successfully",
+                description: "Your new project has been created successfully",
             });
             // Optionally navigate to the new project immediately
             // navigate(`/projects/${newProject.id}`);
@@ -76,7 +76,7 @@ export function ProjectsDashboard() {
             console.error("Failed to create project:", error);
             toast({
                 title: "Error",
-                description: "Failed to create project",
+                description: "We hit a snag creating your project. Please try again.",
                 variant: "destructive",
             });
         } finally {
@@ -94,7 +94,7 @@ export function ProjectsDashboard() {
             toast({ title: "Success", description: "Project deleted successfully" });
         } catch (error) {
             console.error("Failed to delete:", error);
-            toast({ title: "Error", description: "Failed to delete project", variant: "destructive" });
+            toast({ title: "Error", description: "We couldn't delete the project right now. Please try again.", variant: "destructive" });
         }
     };
 
@@ -110,10 +110,10 @@ export function ProjectsDashboard() {
             a.click();
             window.URL.revokeObjectURL(url);
             document.body.removeChild(a);
-            toast({ title: "Success", description: "Download started" });
+            toast({ title: "Success", description: "Your project download has started" });
         } catch (error) {
             console.error("Failed to download:", error);
-            toast({ title: "Error", description: "Failed to download project", variant: "destructive" });
+            toast({ title: "Error", description: "We couldn't download the project. Please try again.", variant: "destructive" });
         }
     };
 
@@ -135,7 +135,7 @@ export function ProjectsDashboard() {
             toast({ title: "Success", description: "Project renamed successfully" });
         } catch (error) {
             console.error("Failed to rename:", error);
-            toast({ title: "Error", description: "Failed to rename project", variant: "destructive" });
+            toast({ title: "Error", description: "We couldn't rename the project. Please try again.", variant: "destructive" });
         }
     };
 
@@ -171,7 +171,7 @@ export function ProjectsDashboard() {
                                     setIsBillingLoading(true);
                                     try {
                                         const res = await api.openCustomerPortal();
-                                        if (res?.url) window.location.href = res.url;
+                                        if (res?.portalUrl) window.location.href = res.portalUrl;
                                     } catch (e) {
                                         toast({ title: "Error", description: "Failed to open billing portal", variant: "destructive" });
                                     } finally {
@@ -186,7 +186,7 @@ export function ProjectsDashboard() {
                             <Button
                                 variant="outline"
                                 size="sm"
-                                className="h-8 text-xs rounded-full border-border bg-background shadow-sm hover:bg-accent hidden sm:flex"
+                                className="h-8 text-xs rounded-full border border-black/10 bg-white shadow-sm hover:bg-white/90 hidden sm:flex text-foreground"
                                 onClick={() => setIsPricingModalOpen(true)}
                             >
                                 Upgrade Plan

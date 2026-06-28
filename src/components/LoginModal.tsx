@@ -43,7 +43,7 @@ export function LoginModal() {
     } catch (error) {
       toast({
         title: "Login failed",
-        description: error instanceof Error ? error.message : "Invalid credentials",
+        description: "We couldn't find an account with those details. Please check your credentials or sign up.",
         variant: "destructive",
       });
     } finally {

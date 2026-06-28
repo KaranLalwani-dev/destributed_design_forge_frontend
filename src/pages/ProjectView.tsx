@@ -76,7 +76,7 @@ export function ProjectView() {
         console.error("Failed to load project data:", error);
         toast({
           title: "Error",
-          description: "Failed to load project data",
+          description: "We couldn't load this project. It might have been deleted or there is a connection issue.",
           variant: "destructive"
         });
       } finally {
@@ -164,10 +164,9 @@ export function ProjectView() {
         setIsStreaming(false);
       },
       (error) => {
-        // Handle error
         toast({
-          title: "Chat error",
-          description: error.message,
+          title: "Error",
+          description: "We had trouble connecting to the AI. Please try sending your message again.",
           variant: "destructive",
         });
         setMessages((prev) =>
@@ -225,17 +224,31 @@ Please analyze this error and fix the code to resolve it.`;
     setRuntimeError(null);
   }, [handleSendMessage]);
 
+  const handleClearChat = async () => {
+    if (!projectId) return;
+    if (!confirm("Are you sure you want to clear the chat history?")) return;
+
+    try {
+      await api.clearChatHistory(projectId);
+      setMessages([]);
+      toast({ title: "Chat cleared", description: "The conversation history has been removed." });
+    } catch (error) {
+      console.error("Failed to clear chat:", error);
+      toast({ title: "Error", description: "We couldn't clear the chat right now. Please try again.", variant: "destructive" });
+    }
+  };
+
   const handleDeleteProject = async () => {
     if (!projectId) return;
     if (!confirm("Are you sure you want to delete this project? This action cannot be undone.")) return;
 
     try {
       await api.deleteProject(projectId);
-      navigate("/projects");
       toast({ title: "Success", description: "Project deleted successfully" });
+      navigate("/projects");
     } catch (error) {
-      console.error("Failed to delete:", error);
-      toast({ title: "Error", description: "Failed to delete project", variant: "destructive" });
+      console.error("Failed to delete project:", error);
+      toast({ title: "Error", description: "We couldn't delete the project right now. Please try again.", variant: "destructive" });
     }
   };
 
@@ -251,10 +264,10 @@ Please analyze this error and fix the code to resolve it.`;
       a.click();
       window.URL.revokeObjectURL(url);
       document.body.removeChild(a);
-      toast({ title: "Success", description: "Download started" });
+      toast({ title: "Success", description: "Your project download has started" });
     } catch (error) {
-      console.error("Failed to download:", error);
-      toast({ title: "Error", description: "Failed to download project", variant: "destructive" });
+      console.error("Failed to download project:", error);
+      toast({ title: "Error", description: "We couldn't download the project. Please try again.", variant: "destructive" });
     }
   };
 
@@ -266,16 +279,16 @@ Please analyze this error and fix the code to resolve it.`;
   };
 
   const handleRenameSubmit = async () => {
-    if (!projectId || !renameName.trim()) return;
+    if (!projectId || !renameName.trim() || !project) return;
 
     try {
-      const updated = await api.updateProject(projectId, renameName);
-      setProject(prev => prev ? { ...prev, name: updated.name } : null);
+      await api.updateProject(projectId, renameName);
+      setProject({ ...project, name: renameName });
       setIsRenameDialogOpen(false);
       toast({ title: "Success", description: "Project renamed successfully" });
     } catch (error) {
       console.error("Failed to rename:", error);
-      toast({ title: "Error", description: "Failed to rename project", variant: "destructive" });
+      toast({ title: "Error", description: "We couldn't rename the project. Please try again.", variant: "destructive" });
     }
   };
 
@@ -400,7 +413,7 @@ Please analyze this error and fix the code to resolve it.`;
           <ShareDialog
             projectId={projectId}
             trigger={
-              <Button variant="outline" size="sm" className="h-8 text-xs font-medium rounded-full border-black/10 bg-panel/30 backdrop-blur-md hover:bg-panel/60" disabled={project?.role === 'VIEWER'}>
+              <Button variant="outline" size="sm" className="h-8 text-xs font-medium rounded-full border border-black/10 bg-white shadow-sm hover:bg-white/90 text-foreground" disabled={project?.role === 'VIEWER'}>
                 Share
               </Button>
             }
@@ -416,7 +429,7 @@ Please analyze this error and fix the code to resolve it.`;
                     setIsBillingLoading(true);
                     try {
                       const res = await api.openCustomerPortal();
-                      if (res?.url) window.location.href = res.url;
+                      if (res?.portalUrl) window.location.href = res.portalUrl;
                     } catch (e) {
                       toast({ title: "Error", description: "Failed to open billing portal", variant: "destructive" });
                     } finally {
@@ -431,7 +444,7 @@ Please analyze this error and fix the code to resolve it.`;
                 <Button
                   variant="outline"
                   size="sm"
-                  className="h-8 text-xs rounded-full border-black/10 bg-panel/30 backdrop-blur-md hover:bg-panel/60"
+                  className="h-8 text-xs rounded-full border border-black/10 bg-white shadow-sm hover:bg-white/90 text-foreground"
                   onClick={() => setIsPricingModalOpen(true)}
                 >
                   Upgrade

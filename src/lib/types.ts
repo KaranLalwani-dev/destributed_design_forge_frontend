@@ -109,22 +109,26 @@ export interface AuthResponse {
 
 export type SubscriptionStatus = 'ACTIVE' | 'TRIALING' | 'PAST_DUE' | 'CANCELED' | 'INCOMPLETE' | 'FREE';
 
+export interface PlanDto {
+  id: number;
+  name: string;
+  maxProjects: number;
+  maxTokensPerDay: number;
+  unlimitedAi: boolean;
+  price: string;
+}
+
 export interface SubscriptionResponse {
-  id?: number;
-  userId: number;
-  planId?: number;
-  stripeSubscriptionId?: string;
-  stripeCustomerId?: string;
+  plan: PlanDto;
   status: SubscriptionStatus;
-  currentPeriodStart?: string;
-  currentPeriodEnd?: string;
-  cancelAtPeriodEnd?: boolean;
+  currentPeriodEnd: string;
+  tokensUsedThisCycle: number;
 }
 
 export interface CheckoutResponse {
-  url: string;
+  checkoutUrl: string;
 }
 
 export interface PortalResponse {
-  url: string;
+  portalUrl: string;
 }
