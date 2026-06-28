@@ -90,10 +90,10 @@ export function ShareDialog({ projectId, trigger, open, onOpenChange }: ShareDia
     return (
         <Dialog open={isOpen} onOpenChange={handleOpenChange}>
             {trigger && <DialogTrigger asChild>{trigger}</DialogTrigger>}
-            <DialogContent className="sm:max-w-md gap-0 p-0 overflow-hidden bg-background/95 backdrop-blur-xl border border-white/10 shadow-2xl">
+            <DialogContent className="sm:max-w-md gap-0 p-0 overflow-hidden bg-background border border-border/50 shadow-2xl">
                 <div className="p-6 pb-4">
                     <DialogHeader className="mb-4">
-                        <DialogTitle className="text-xl font-semibold tracking-tight">Share project</DialogTitle>
+                        <DialogTitle className="text-xl font-semibold tracking-tight text-foreground">Share project</DialogTitle>
                     </DialogHeader>
 
                     {/* Invite Section */}
@@ -101,7 +101,7 @@ export function ShareDialog({ projectId, trigger, open, onOpenChange }: ShareDia
                         <div className="flex gap-2">
                             <Input
                                 placeholder="Email or username"
-                                className="flex-1 bg-white/5 border-white/10 text-foreground placeholder:text-muted-foreground focus-visible:ring-primary/50"
+                                className="flex-1 bg-white border-border/80 text-foreground placeholder:text-muted-foreground focus-visible:ring-primary/50 shadow-sm rounded-xl"
                                 value={inviteEmail}
                                 onChange={(e) => setInviteEmail(e.target.value)}
                                 onKeyDown={(e) => e.key === "Enter" && handleInvite()}
@@ -109,16 +109,16 @@ export function ShareDialog({ projectId, trigger, open, onOpenChange }: ShareDia
                             <Button
                                 onClick={handleInvite}
                                 disabled={!inviteEmail.trim() || loading}
-                                className="px-6 font-medium"
+                                className="px-6 font-medium rounded-xl"
                             >
                                 Invite
                             </Button>
                         </div>
                         <Select value={inviteRole} onValueChange={(val) => setInviteRole(val as ProjectRole)}>
-                            <SelectTrigger className="w-full bg-white/5 border-white/10 text-foreground focus:ring-primary/50">
+                            <SelectTrigger className="w-full bg-white border-border/80 text-foreground focus:ring-primary/50 shadow-sm rounded-xl">
                                 <SelectValue />
                             </SelectTrigger>
-                            <SelectContent className="bg-background/95 backdrop-blur-xl border-white/10">
+                            <SelectContent className="bg-white border-border/80">
                                 <SelectItem value="VIEWER">Can view</SelectItem>
                                 <SelectItem value="EDITOR">Can edit</SelectItem>
                                 <SelectItem value="OWNER">Owner</SelectItem>
@@ -132,9 +132,9 @@ export function ShareDialog({ projectId, trigger, open, onOpenChange }: ShareDia
 
                         <div className="space-y-2 max-h-[300px] overflow-y-auto pr-1">
                             {members.length === 0 && (
-                                <div className="flex items-center gap-3 p-3 rounded-xl bg-white/5 border border-white/5">
-                                    <Avatar className="h-10 w-10 ring-1 ring-white/10">
-                                        <AvatarFallback className="bg-primary/20 text-primary">ME</AvatarFallback>
+                                <div className="flex items-center gap-3 p-3 rounded-xl bg-white border border-border/40 shadow-sm">
+                                    <Avatar className="h-10 w-10 ring-1 ring-border/50">
+                                        <AvatarFallback className="bg-secondary text-foreground text-sm font-medium">ME</AvatarFallback>
                                     </Avatar>
                                     <div className="flex-1 text-sm">
                                         <div className="font-medium text-foreground">You</div>
@@ -145,9 +145,9 @@ export function ShareDialog({ projectId, trigger, open, onOpenChange }: ShareDia
                             )}
 
                             {Array.isArray(members) && members.map(member => (
-                                <div key={member.userId} className="flex items-center gap-3 p-3 rounded-xl bg-white/5 border border-white/5 hover:bg-white/10 transition-all duration-200">
-                                    <Avatar className="h-10 w-10 ring-1 ring-white/10">
-                                        <AvatarFallback className="bg-primary/20 text-primary text-sm font-medium">
+                                <div key={member.userId} className="flex items-center gap-3 p-3 rounded-xl bg-white border border-border/40 shadow-sm hover:shadow transition-all duration-200">
+                                    <Avatar className="h-10 w-10 ring-1 ring-border/50">
+                                        <AvatarFallback className="bg-secondary text-foreground text-sm font-medium">
                                             {member.name ? member.name.charAt(0).toUpperCase() : (member.username || "U").slice(0, 2).toUpperCase()}
                                         </AvatarFallback>
                                     </Avatar>
@@ -166,13 +166,13 @@ export function ShareDialog({ projectId, trigger, open, onOpenChange }: ShareDia
                                                 else handleRoleChange(member.userId, val as ProjectRole);
                                             }}
                                         >
-                                            <SelectTrigger className="h-8 w-[100px] text-xs border-white/10 bg-white/5 hover:bg-white/10 focus:ring-1 focus:ring-primary/50 shadow-none transition-colors">
+                                            <SelectTrigger className="h-8 w-[100px] text-xs border-border bg-white hover:bg-muted focus:ring-1 focus:ring-primary/50 shadow-sm transition-colors rounded-lg">
                                                 <SelectValue />
                                             </SelectTrigger>
-                                            <SelectContent align="end" className="bg-background/95 backdrop-blur-xl border-white/10">
+                                            <SelectContent align="end" className="bg-white border-border">
                                                 <SelectItem value="EDITOR">Can edit</SelectItem>
                                                 <SelectItem value="VIEWER">Can view</SelectItem>
-                                                <SelectItem value="REMOVE" className="text-red-400 focus:text-red-300 focus:bg-red-400/10">Remove</SelectItem>
+                                                <SelectItem value="REMOVE" className="text-red-500 focus:text-red-600 focus:bg-red-50">Remove</SelectItem>
                                             </SelectContent>
                                         </Select>
                                     )}
