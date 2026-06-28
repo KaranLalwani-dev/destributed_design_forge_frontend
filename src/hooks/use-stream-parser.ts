@@ -25,6 +25,9 @@ export const useStreamParser = (streamBuffer: string) => {
       const attrMatch = ATTR_REGEX.exec(openTagMatch);
       const attrValue = attrMatch ? attrMatch[1] : undefined;
 
+      const phaseMatch = /phase="([^"]+)"/i.exec(openTagMatch);
+      const phaseValue = phaseMatch ? phaseMatch[1].toLowerCase() : undefined;
+
       let type: ChatEventType = ChatEventType.MESSAGE;
       let filePath: string | undefined;
       let metadata: string | undefined;
@@ -35,6 +38,12 @@ export const useStreamParser = (streamBuffer: string) => {
       } else if (typeStr === 'file') {
         type = ChatEventType.FILE_EDIT;
         filePath = attrValue;
+      } else if (typeStr === 'message') {
+        if (phaseValue === 'planning' || phaseValue === 'start') {
+          type = ChatEventType.THOUGHT;
+        } else {
+          type = ChatEventType.MESSAGE;
+        }
       }
 
       events.push({

@@ -343,7 +343,11 @@ export const api = {
 
     fetch(`${BASE_URL}/api/v1/intelligence/chat/stream`, {
       method: "POST",
-      headers: { "Content-Type": "application/json", ...getAuthHeaders() },
+      headers: { 
+        "Content-Type": "application/json", 
+        "Accept": "text/event-stream",
+        ...getAuthHeaders() 
+      },
       body: JSON.stringify({ message, projectId }),
       signal: controller.signal,
     })

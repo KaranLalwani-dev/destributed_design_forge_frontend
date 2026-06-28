@@ -13,9 +13,17 @@ export const ChatEventRenderer = ({ event, isLoading }: { event: ChatEvent, isLo
   switch (event.type) {
     case ChatEventType.THOUGHT:
       return (
-        <div className="flex items-center gap-2 text-muted-foreground text-[13px] font-normal mb-4">
-          {isLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Lightbulb className="w-4 h-4" />}
-          <span>{event.content}</span>
+        <div className="flex flex-col gap-2 bg-muted/30 border border-border/50 rounded-xl p-3 mb-4 mt-2 relative overflow-hidden">
+          <div className="flex items-center gap-2 text-muted-foreground text-[13px] font-medium border-b border-border/30 pb-2 mb-1">
+            {isLoading ? <Loader2 className="w-4 h-4 animate-spin text-primary" /> : <Lightbulb className="w-4 h-4 text-amber-500" />}
+            <span>{isLoading ? "Thinking..." : "Agent Thought"}</span>
+          </div>
+          <div className="prose prose-sm prose-p:leading-relaxed prose-pre:bg-muted/50 max-w-none text-muted-foreground/80 text-[13px]">
+            <ReactMarkdown remarkPlugins={[remarkGfm]}>
+              {event.content}
+            </ReactMarkdown>
+            {isLoading && <span className="inline-block w-1.5 h-3.5 ml-1 bg-primary/60 animate-pulse align-middle" />}
+          </div>
         </div>
       );
 

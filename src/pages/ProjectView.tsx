@@ -65,9 +65,9 @@ export function ProjectView() {
         const formattedMessages: ChatMessage[] = history.map((msg) => ({
           id: msg.id.toString(),
           role: msg.role === "USER" ? "user" : "assistant",
-          content: msg.content,
+          content: msg.content || "", // Fallback to empty string for assistant messages
           createdAt: msg.createdAt,
-          events: msg.events,
+          events: msg.events || [],
         }));
         setMessages(formattedMessages);
         setProject(projectData);
