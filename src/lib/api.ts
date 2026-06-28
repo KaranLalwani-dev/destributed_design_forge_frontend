@@ -409,23 +409,16 @@ export const api = {
   },
 
   // --- Billing API ---
-  async getMySubscription(): Promise<import('./types').SubscriptionResponse | null> {
-    const response = await fetch(`${BASE_URL}/api/me/subscription`, {
+  async getMySubscription(): Promise<import('./types').SubscriptionResponse> {
+    const response = await fetch(`${BASE_URL}/api/v1/account/api/me/subscription`, {
       headers: getAuthHeaders(),
     });
-    if (!response.ok) {
-      if (response.status === 404) return null;
-      throw new Error("Failed to fetch subscription");
-    }
-    if (response.status === 204) return null;
-    
-    const text = await response.text();
-    if (!text) return null;
-    return JSON.parse(text);
+    if (!response.ok) throw new Error("Failed to fetch subscription");
+    return response.json();
   },
 
   async createCheckoutSession(planId: number): Promise<import('./types').CheckoutResponse> {
-    const response = await fetch(`${BASE_URL}/api/payments/checkout`, {
+    const response = await fetch(`${BASE_URL}/api/v1/account/api/payments/checkout`, {
       method: "POST",
       headers: { ...getAuthHeaders(), "Content-Type": "application/json" },
       body: JSON.stringify({ planId }),
@@ -435,7 +428,7 @@ export const api = {
   },
 
   async openCustomerPortal(): Promise<import('./types').PortalResponse> {
-    const response = await fetch(`${BASE_URL}/api/payments/portal`, {
+    const response = await fetch(`${BASE_URL}/api/v1/account/api/payments/portal`, {
       method: "POST",
       headers: getAuthHeaders(),
     });
